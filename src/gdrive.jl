@@ -18,7 +18,8 @@ function unshortlink(url; kw...)
         url = HTTP.header(rq, "Location")
         rq = HTTP.request("HEAD", url; redirect=false, status_exception=false, kw...)
     end
-    url
+
+    return url
 end
 
 is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
@@ -32,10 +33,13 @@ function gsheet_handler(url; format=:csv)
     elseif startswith(expo, "export")
         url = replace(url, r"format=([a-zA-Z]*)(.*)"=>SubstitutionString("format=$format\\2"))
     end
-    url
+
+    return url
 end
 
 function gfile_handler(url)
+    # pattern of file path in google drive:
+    # https://drive.google.com/file/d/<hash>/view?usp=sharing
     p, ｈ = splitdir(url)
     while splitdir(p)[2] != "d"
         p, ｈ = splitdir(p)
@@ -45,26 +49,14 @@ function gfile_handler(url)
     return url
 end
 
-function maybegoogle_download(url, localdir)
-    long_url = unshortlink(url)
-    is_gsheet(long_url) && (long_url = gsheet_handler(long_url))
-    is_gfile(long_url) && (long_url = gfile_handler(long_url))
-
-    if is_gdoc(long_url)
-        download_gdrive(long_url, localdir)
-    else
-        DataDeps.fetch_http(long_url, localdir)
-    end
-end
-
 function find_gcode(ckj)
     for cookie ∈ ckj
-        if match(r"_warning_", cookie.name) !== nothing
+        if match(r"download_warning_", cookie.name) !== nothing
             return cookie.value
         end
     end
 
-    nothing
+    return
 end
 
 function download_gdrive(url, localdir; retry=true, retries=4)
@@ -142,7 +134,6 @@ function download_gdrive(url, localdir; retry=true, retries=4)
                   )
         end
 
-
         Base.open(filepath, "w") do fh
             while(!eof(stream))
                 downloaded_bytes += write(fh, readavailable(stream))
@@ -155,5 +146,18 @@ function download_gdrive(url, localdir; retry=true, retries=4)
         end
         report_callback()
     end
-    filepath
+
+    return filepath
+end
+
+function maybegoogle_download(url, localdir)
+    long_url = unshortlink(url)
+    is_gsheet(long_url) && (long_url = gsheet_handler(long_url))
+    is_gfile(long_url) && (long_url = gfile_handler(long_url))
+
+    if is_gdoc(long_url)
+        download_gdrive(long_url, localdir)
+    else
+        DataDeps.fetch_http(long_url, localdir)
+    end
 end
