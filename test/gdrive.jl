@@ -23,3 +23,15 @@ end
 
     rm("$GFILE_NAME.txt", recursive=true, force=true)
 end
+
+const GSHEET = "https://docs.google.com/spreadsheets/d/1rwoDt5HrcP6TTgBe3BWxp7kPdVMWuS1cGVZp7BXhPwc/edit?usp=sharing"
+const GSHEET_NAME = "FetchTest"
+
+@testset "sheet" begin
+    gdownload(GSHEET, pwd())
+    open(joinpath(pwd(), "$GSHEET_NAME-1.csv"), "r") do file
+        @test readline(file) == "Test,1"
+    end
+
+    rm("$GSHEET_NAME-1.csv", recursive=true, force=true)
+end
