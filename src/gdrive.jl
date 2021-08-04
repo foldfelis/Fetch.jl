@@ -5,6 +5,10 @@ using HTTP
 
 export gdownload
 
+is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
+is_gfile(url) = occursin("drive.google.com/file/d", url)
+is_gdoc(url) = occursin("docs.google.com", url)
+
 """
     unshortlink(url)
 
@@ -12,17 +16,13 @@ return unshorten url or the url if it is not a short link
 """
 function unshortlink(url; kw...)
     rq = HTTP.request("HEAD", url; redirect=false, status_exception=false, kw...)
-    while rq.status ÷ 100 == 3
+    while !is_gdoc(url) && (rq.status ÷ 100 == 3)
         url = HTTP.header(rq, "Location")
         rq = HTTP.request("HEAD", url; redirect=false, status_exception=false, kw...)
     end
 
     return url
 end
-
-is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
-is_gfile(url) = occursin("drive.google.com/file/d", url)
-is_gdoc(url) = occursin("docs.google.com", url)
 
 function gsheet_handler(url; format=:csv)
     link, expo = splitdir(url)
