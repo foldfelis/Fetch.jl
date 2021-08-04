@@ -3,7 +3,9 @@ using Dates
 using Random: randstring
 using HTTP
 
-export download_gdrive
+export
+    download_gdrive,
+    maybegoogle_download
 
 """
     unshortlink(url)
@@ -19,10 +21,11 @@ function unshortlink(url; kw...)
     url
 end
 
-isgooglesheet(url) = occursin("docs.google.com/spreadsheets", url)
-isgoogledrive(url) = occursin("docs.google.com", url)
+is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
+is_gdoc(url) = occursin("docs.google.com", url)
+is_gfile(url) = occursin("drive.google.com/file/d", url)
 
-function sheet_handler(url; format=:csv)
+function gsheet_handler(url; format=:csv)
     link, expo = splitdir(url)
     if startswith(expo, "edit") || expo == ""
         url = link * "/export?format=$format"
@@ -32,11 +35,22 @@ function sheet_handler(url; format=:csv)
     url
 end
 
+function gfile_handler(url)
+    p, ｈ = splitdir(url)
+    while splitdir(p)[2] != "d"
+        p, ｈ = splitdir(p)
+    end
+    url = "https://docs.google.com/uc?export=download&id=" * ｈ
+
+    return url
+end
+
 function maybegoogle_download(url, localdir)
     long_url = unshortlink(url)
-    isgooglesheet(long_url) && (long_url = googlesheet_handler(long_url))
+    is_gsheet(long_url) && (long_url = gsheet_handler(long_url))
+    is_gfile(long_url) && (long_url = gfile_handler(long_url))
 
-    if isgoogledrive(long_url)
+    if is_gdoc(long_url)
         download_gdrive(long_url, localdir)
     else
         DataDeps.fetch_http(long_url, localdir)
