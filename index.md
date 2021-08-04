@@ -1,3 +1,5 @@
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 ## Source code status
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://foldfelis.github.io/Fetch.jl/stable)
