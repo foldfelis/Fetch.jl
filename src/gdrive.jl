@@ -82,7 +82,7 @@ function download_gdrive(url, localdir)
         filepath = joinpath(localdir, find_filename(header))
 
         total_bytes = tryparse(Int64, split(HTTP.header(response, "Content-Range"), '/')[end])
-        (total_bytes === nothing) && (total_bytes = NaN)
+        (total_bytes === nothing) && (total_bytes = missing)
         println("Total: $total_bytes bytes")
 
         downloaded_bytes = progress = 0
