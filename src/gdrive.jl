@@ -66,7 +66,7 @@ end
 function download_gdrive(url, localdir)
     cookiejars = Dict{String, Set{HTTP.Cookies.Cookie}}()
     HTTP.request("GET", url; cookies=true, cookiejar=cookiejars)
-    gcode = Fetch.find_gcode(cookiejars["docs.google.com"])
+    gcode = find_gcode(cookiejars["docs.google.com"])
 
     !isnothing(gcode) && (url = "$url&confirm=$gcode")
 
