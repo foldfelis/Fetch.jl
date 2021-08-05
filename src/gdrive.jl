@@ -39,7 +39,7 @@ function gfile_handler(url)
     # pattern of file path in google drive:
     # https://drive.google.com/file/d/<hash>/view?usp=sharing
     h = match(r"/file/d/([^\/]+)/", url)
-    (h === nothing) && throw("invalid url")
+    (h === nothing) && throw("Can't find goole drive file ID in the url")
 
     return "https://docs.google.com/uc?export=download&id=$(h.captures[])"
 end
