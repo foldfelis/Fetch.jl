@@ -16,7 +16,7 @@ return unshorten url or the url if it is not a short link
 """
 function unshortlink(url; kw...)
     rq = HTTP.request("HEAD", url; redirect=false, status_exception=false, kw...)
-    while !is_gdoc(url) && (rq.status ÷ 100 == 3)
+    while !(is_gdoc(url) || is_gfile(url)) && (rq.status ÷ 100 == 3)
         url = HTTP.header(rq, "Location")
         rq = HTTP.request("HEAD", url; redirect=false, status_exception=false, kw...)
     end
@@ -82,7 +82,7 @@ function download_gdrive(url, localdir)
         filepath = joinpath(localdir, find_filename(header))
 
         total_bytes = tryparse(Int64, rsplit(HTTP.header(response, "Content-Range"), '/'; limit=2)[end])
-        (total_bytes === nothing) && (total_bytes = missing)
+        (total_bytes === nothing) && (total_bytes = NaN)
         println("Total: $total_bytes bytes")
 
         downloaded_bytes = progress = 0
