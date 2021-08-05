@@ -1,5 +1,3 @@
-using DataDeps
-using Dates
 using Random: randstring
 using HTTP
 
@@ -56,6 +54,7 @@ function find_filename(header)
     m = match(r"filename=\\\"(.*)\\\"", header)
     if m === nothing
         filename = "gdrive_downloaded-$(randstring())"
+        @warn "File name not found, use `$filename`"
     else
         filename = m.captures[]
     end
