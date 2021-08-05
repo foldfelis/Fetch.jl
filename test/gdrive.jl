@@ -35,3 +35,9 @@ const GSHEET_NAME = "FetchTest"
 
     rm("$GSHEET_NAME-1.csv", recursive=true, force=true)
 end
+
+@testset "unshortlink" begin
+    @test Fetch.unshortlink("https://bit.ly/3ir0gYu") == LARGE_GFILE
+    @test Fetch.unshortlink("https://bit.ly/3yqqdwK") == SMALL_GDRIVE
+    @test Fetch.unshortlink("https://bit.ly/3yDDi69") == GSHEET
+end
