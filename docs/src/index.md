@@ -24,6 +24,15 @@ using Fetch
 gdownload("https://drive.google.com/file/d/1OiX6gEWRm57kb1H8L0K_HWN_pzc-sk8y/view?usp=sharing", pwd())
 ```
 
+## Download dataset from Kaggle
+
+Download dataset from Kaggle via the name:
+
+```julia
+using Fetch
+kdownload("ningjingyu/fetchtest", pwd())
+```
+
 ## Intergrate with DataDeps.jl
 
 According to [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl), `DataDep` can be construct as following:
@@ -57,6 +66,25 @@ register(DataDep(
 
 datadep"FetchTest"
 ```
+
+Or to Kaggle
+
+```julia
+using DataDeps
+using Fetch
+
+register(DataDep(
+    "FetchTest",
+    """Test dataset""",
+    "ningjingyu/fetchtest",
+    "65492e1f4c6affb7955125e5e4cece2bb547e482627f3af9812c06448dae40a9",
+    fetch_method=kdownload,
+    post_fetch_method=unpack
+))
+
+datadep"FetchTest"
+```
+
 
 ```@index
 ```
