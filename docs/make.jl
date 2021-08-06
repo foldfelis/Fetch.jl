@@ -20,4 +20,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/foldfelis/Fetch.jl",
+    devbranch="main"
 )
