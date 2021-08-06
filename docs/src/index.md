@@ -50,6 +50,7 @@ register(DataDep(
     "FetchTest",
     """Test dataset""",
     "https://drive.google.com/file/d/1OiX6gEWRm57kb1H8L0K_HWN_pzc-sk8y/view?usp=sharing",
+    "b083597a25bec4c82c2060651be40c0bb71075b472d3b0fabd85af92cc4a7076"
     fetch_method=gdownload,
     post_fetch_method=unpack
 ))
