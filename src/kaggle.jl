@@ -32,6 +32,7 @@ function kdownload(dataset, localdir)
     filepath = joinpath(localdir, "$(replace(dataset, '/'=>'_')).zip")
 
     HTTP.open("GET", url, ["Authorization"=>gen_auth_key()]) do stream
+        HTTP.startread(stream)
         eof(stream) && return
 
         total_bytes = tryparse(Int64, HTTP.header(stream, "Content-Length"))
