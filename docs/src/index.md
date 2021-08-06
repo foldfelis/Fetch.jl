@@ -92,3 +92,6 @@ datadep"FetchTest"
 ```@autodocs
 Modules = [Fetch]
 ```
+
+According to the document of [Kaggle-api](https://github.com/Kaggle/kaggle-api#api-credentials) one needs to set their environment variables `KAGGLE_USERNAME` and `KAGGLE_KEY`, 
+or simply download the api token from Kaggle, and place this file in the location `~/.kaggle/kaggle.json` (on Windows in the location `C:\Users\<Windows-username>\.kaggle\kaggle.json`).
