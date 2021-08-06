@@ -1,6 +1,3 @@
-using Random: randstring
-using HTTP
-
 export gdownload
 
 is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
