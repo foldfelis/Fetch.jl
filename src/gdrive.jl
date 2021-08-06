@@ -84,7 +84,7 @@ function download_gdrive(url, localdir)
         downloaded_bytes = progress = 0
         print("Downloaded:\e[s")
         Base.open(filepath, "w") do fh
-            while(!eof(stream))
+            while !eof(stream)
                 downloaded_bytes += write(fh, readavailable(stream))
                 new_progress = 100downloaded_bytes ÷ total_bytes
                 (new_progress > progress) && print("\e[u $downloaded_bytes bytes ($new_progress%)")
