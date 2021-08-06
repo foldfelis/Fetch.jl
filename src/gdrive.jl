@@ -100,6 +100,11 @@ function download_gdrive(url, localdir)
     return filepath
 end
 
+"""
+    gdownload(url, localdir)
+
+Download file or Google Sheet from Google drive.
+"""
 function gdownload(url, localdir)
     url = unshortlink(url)
 
