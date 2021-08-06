@@ -10,9 +10,13 @@ StructTypes.StructType(::Type{Auth}) = StructTypes.Struct()
 function gen_auth_key()
     auth_file = joinpath(homedir(), ".kaggle", "kaggle.json")
 
-    f = open(auth_file, "r")
-    auth = JSON3.read(f, Auth)
-    close(f)
+    if isfile(auth_file)
+        f = open(auth_file, "r")
+        auth = JSON3.read(f, Auth)
+        close(f)
+    else
+        auth = Auth(ENV["KAGGLE_USERNAME"], ENV["KAGGLE_KEY"])
+    end
 
     auth_str = Base64.base64encode("$(auth.username):$(auth.key)")
 
