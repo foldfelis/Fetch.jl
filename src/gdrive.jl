@@ -72,6 +72,8 @@ function download_gdrive(url, localdir)
         cookies=true, cookiejar=cookiejars, redirect_limit=10
     ) do stream
         response = HTTP.startread(stream)
+        eof(stream) && return
+        
         header = HTTP.header(response, "Content-Disposition")
         isempty(header) && return
 
