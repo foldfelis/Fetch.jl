@@ -21,7 +21,8 @@ Download file or Google Sheet from Google drive via the share link:
 
 ```julia
 using Fetch
-gdownload("https://drive.google.com/file/d/1OiX6gEWRm57kb1H8L0K_HWN_pzc-sk8y/view?usp=sharing", pwd())
+link = "https://drive.google.com/file/d/1OiX6gEWRm57kb1H8L0K_HWN_pzc-sk8y/view?usp=sharing"
+gdownload(link, pwd())
 ```
 
 ## Download dataset from Kaggle
@@ -30,12 +31,14 @@ Download dataset from Kaggle via the name:
 
 ```julia
 using Fetch
-kdownload("ningjingyu/fetchtest", pwd())
+dataset = "ningjingyu/fetchtest"
+kdownload(dataset, pwd())
 ```
 
 ## Intergrate with DataDeps.jl
 
-According to [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl), `DataDep` can be construct as following:
+According to [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl),
+`DataDep` can be construct as following:
 
 ```julia
 DataDep(
@@ -85,6 +88,12 @@ register(DataDep(
 datadep"FetchTest"
 ```
 
+According to the document of [Kaggle-api](https://github.com/Kaggle/kaggle-api#api-credentials)
+one needs to set their environment variables `KAGGLE_USERNAME` and `KAGGLE_KEY`,
+or simply download the api token from Kaggle, and place this file in the location `~/.kaggle/kaggle.json`
+(on Windows in the location `C:\Users\<Windows-username>\.kaggle\kaggle.json`).
+
+## Index
 
 ```@index
 ```
@@ -92,6 +101,3 @@ datadep"FetchTest"
 ```@autodocs
 Modules = [Fetch]
 ```
-
-According to the document of [Kaggle-api](https://github.com/Kaggle/kaggle-api#api-credentials) one needs to set their environment variables `KAGGLE_USERNAME` and `KAGGLE_KEY`, 
-or simply download the api token from Kaggle, and place this file in the location `~/.kaggle/kaggle.json` (on Windows in the location `C:\Users\<Windows-username>\.kaggle\kaggle.json`).
