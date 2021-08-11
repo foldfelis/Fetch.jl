@@ -1,8 +1,12 @@
 export gdownload
 
-is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
-is_gfile(url) = occursin("drive.google.com/file/d", url)
-is_gdoc(url) = occursin("docs.google.com", url)
+const SPREADSHEET_PATTERN = "docs.google.com/spreadsheets"
+const DRIVE_PATTERN = "drive.google.com/file/d"
+const DOCS_PATTERN = "docs.google.com"
+
+is_gsheet(url) = occursin(SPREADSHEET_PATTERN, url)
+is_gfile(url) = occursin(DRIVE_PATTERN, url)
+is_gdoc(url) = occursin(DOCS_PATTERN, url)
 
 """
     unshortlink(url)
@@ -19,7 +23,7 @@ function unshortlink(url; kw...)
     return url
 end
 
-function gsheet_handler(url; format=:csv)
+function prepare_gsheet_url(url; format=:csv)
     link, expo = splitdir(url)
     if startswith(expo, "edit") || (expo == "")
         url = link * "/export?format=$format"
@@ -30,16 +34,18 @@ function gsheet_handler(url; format=:csv)
     return url
 end
 
-function gfile_handler(url)
+function prepare_gfile_url(url)
     # pattern of file path in google drive:
     # https://drive.google.com/file/d/<hash>/view?usp=sharing
     h = match(r"/file/d/([^\/]+)/", url)
-    (h === nothing) && throw("Can't find goole drive file ID in the url")
-
-    return "https://docs.google.com/uc?export=download&id=$(h.captures[])"
+    if isnothing(h)
+        throw(ErrorException("Can't find goole drive file ID in the url"))
+    else
+        return "https://docs.google.com/uc?export=download&id=$(h.captures[])"
+    end
 end
 
-function find_gcode(cookies)
+function fetch_gcode(cookies)
     for cookie in cookies
         (match(r"download_warning_", cookie.name) !== nothing) && (return cookie.value)
     end
@@ -47,9 +53,9 @@ function find_gcode(cookies)
     return
 end
 
-function find_filename(header)
+function fetch_filename(header)
     m = match(r"filename=\\\"(.*)\\\"", header)
-    if m === nothing
+    if isnothing(m)
         filename = "gdrive_downloaded-$(randstring())"
         @warn "File name not found, use `$filename`"
     else
@@ -62,9 +68,9 @@ end
 function download_gdrive(url, localdir)
     cookiejars = Dict{String, Set{HTTP.Cookies.Cookie}}()
     HTTP.request("GET", url; cookies=true, cookiejar=cookiejars)
-    gcode = find_gcode(cookiejars["docs.google.com"])
+    gcode = fetch_gcode(cookiejars["docs.google.com"])
 
-    !isnothing(gcode) && (url = "$url&confirm=$gcode")
+    isnothing(gcode) || (url = "$url&confirm=$gcode")
 
     local filepath
     HTTP.open(
@@ -77,10 +83,10 @@ function download_gdrive(url, localdir)
         header = HTTP.header(response, "Content-Disposition")
         isempty(header) && return
 
-        filepath = joinpath(localdir, find_filename(header))
+        filepath = joinpath(localdir, fetch_filename(header))
 
         total_bytes = tryparse(Int64, rsplit(HTTP.header(response, "Content-Range"), '/'; limit=2)[end])
-        (total_bytes === nothing) && (total_bytes = NaN)
+        isnothing(total_bytes) && (total_bytes = NaN)
         println("Total: $total_bytes bytes")
 
         downloaded_bytes = progress = 0
@@ -108,11 +114,11 @@ function gdownload(url, localdir)
     url = unshortlink(url)
 
     if is_gfile(url)
-        url = gfile_handler(url)
+        url = prepare_gfile_url(url)
     elseif is_gsheet(url)
-        url = gsheet_handler(url)
+        url = prepare_gsheet_url(url)
     end
 
-    is_gdoc(url) || throw("invalid url")
+    is_gdoc(url) || throw(ErrorException("invalid url: $url"))
     download_gdrive(url, localdir)
 end
