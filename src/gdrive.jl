@@ -1,8 +1,12 @@
 export gdownload
 
-is_gsheet(url) = occursin("docs.google.com/spreadsheets", url)
-is_gfile(url) = occursin("drive.google.com/file/d", url)
-is_gdoc(url) = occursin("docs.google.com", url)
+const SPREADSHEET_PATTERN = "docs.google.com/spreadsheets"
+const DRIVE_PATTERN = "drive.google.com/file/d"
+const DOCS_PATTERN = "docs.google.com"
+
+is_gsheet(url) = occursin(SPREADSHEET_PATTERN, url)
+is_gfile(url) = occursin(DRIVE_PATTERN, url)
+is_gdoc(url) = occursin(DOCS_PATTERN, url)
 
 """
     unshortlink(url)
@@ -34,7 +38,7 @@ function gfile_handler(url)
     # pattern of file path in google drive:
     # https://drive.google.com/file/d/<hash>/view?usp=sharing
     h = match(r"/file/d/([^\/]+)/", url)
-    (h === nothing) && throw("Can't find goole drive file ID in the url")
+    isnothing(h) && throw(ErrorException("Can't find google drive file ID in the url"))
 
     return "https://docs.google.com/uc?export=download&id=$(h.captures[])"
 end
@@ -49,7 +53,7 @@ end
 
 function find_filename(header)
     m = match(r"filename=\\\"(.*)\\\"", header)
-    if m === nothing
+    if isnothing(m)
         filename = "gdrive_downloaded-$(randstring())"
         @warn "File name not found, use `$filename`"
     else
@@ -66,26 +70,26 @@ function download_gdrive(url, localdir)
 
     !isnothing(gcode) && (url = "$url&confirm=$gcode")
 
-    local filepath
+    filepath = Ref{String}("")
     HTTP.open(
         "GET", url, ["Range"=>"bytes=0-"],
         cookies=true, cookiejar=cookiejars, redirect_limit=10
     ) do stream
         response = HTTP.startread(stream)
         eof(stream) && return
-        
+
         header = HTTP.header(response, "Content-Disposition")
         isempty(header) && return
 
-        filepath = joinpath(localdir, find_filename(header))
+        filepath[] = joinpath(localdir, find_filename(header))
 
         total_bytes = tryparse(Int64, rsplit(HTTP.header(response, "Content-Range"), '/'; limit=2)[end])
-        (total_bytes === nothing) && (total_bytes = NaN)
+        isnothing(total_bytes) && (total_bytes = NaN)
         println("Total: $total_bytes bytes")
 
         downloaded_bytes = progress = 0
         print("Downloaded:\e[s")
-        Base.open(filepath, "w") do fh
+        Base.open(filepath[], "w") do fh
             while !eof(stream)
                 downloaded_bytes += write(fh, readavailable(stream))
                 new_progress = 100downloaded_bytes ÷ total_bytes
@@ -96,7 +100,7 @@ function download_gdrive(url, localdir)
         end
     end
 
-    return filepath
+    return filepath[]
 end
 
 """
