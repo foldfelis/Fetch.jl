@@ -32,8 +32,7 @@ end
 is_kaggle_url(url) = contains(url, KAGGLE_DOMAIN)
 
 function kaggle_url2dataset(url)
-    user_name = match(Regex("$KAGGLE_DOMAIN/([^\\/]+)/"), url).captures[]
-    dataset_name = match(Regex("$user_name/([^\\/]+)"), url).captures[]
+    user_name, dataset_name = match(Regex("$KAGGLE_DOMAIN/([^/]+)/([^/]+)"), url).captures
 
     return "$user_name/$dataset_name"
 end
