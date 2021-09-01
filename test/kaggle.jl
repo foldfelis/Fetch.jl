@@ -33,4 +33,3 @@ end
         rm(joinpath(pwd(), "FetchTest"), recursive=true, force=true)
     end
 end
-    
