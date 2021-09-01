@@ -1,5 +1,7 @@
 export kdownload
 
+const KAGGLE_DOMAIN = "www.kaggle.com"
+
 struct Auth
     username::String
     key::String
@@ -27,7 +29,18 @@ function gen_kaggle_url(dataset)
     return "https://www.kaggle.com/api/v1/datasets/download/$dataset"
 end
 
-function kdownload(dataset, localdir)
+is_kaggle_url(url) = contains(url, KAGGLE_DOMAIN)
+
+function kaggle_url2dataset(url)
+    user_name = match(Regex("$KAGGLE_DOMAIN/([^\\/]+)/"), url).captures[]
+    dataset_name = match(Regex("$user_name/([^\\/]+)"), url).captures[]
+
+    return "$user_name/$dataset_name"
+end
+
+function kdownload(url_or_dataset, localdir)
+    dataset = is_kaggle_url(url_or_dataset) ? kaggle_url2dataset(url_or_dataset) : url_or_dataset
+
     url = gen_kaggle_url(dataset)
     filepath = joinpath(localdir, "$(replace(dataset, '/'=>'_')).zip")
 
