@@ -26,7 +26,7 @@ gdownload(link, pwd())
 
 ## Download dataset from Kaggle
 
-Download dataset from Kaggle via the name:
+Download dataset from Kaggle via the name of dataset:
 
 ```julia
 using Fetch
@@ -34,7 +34,7 @@ dataset = "ningjingyu/fetchtest"
 kdownload(dataset, pwd())
 ```
 
-And via url as well
+Or via the url of the home page of the dataset:
 
 ```julia
 using Fetch
