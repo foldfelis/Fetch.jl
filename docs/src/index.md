@@ -35,6 +35,14 @@ dataset = "ningjingyu/fetchtest"
 kdownload(dataset, pwd())
 ```
 
+Or via the url of the home page of the dataset:
+
+```julia
+using Fetch
+url = "https://www.kaggle.com/ningjingyu/fetchtest"
+kdownload(url, pwd())
+```
+
 ## Intergrate with DataDeps.jl
 
 According to [DataDeps.jl](https://github.com/oxinabox/DataDeps.jl),
