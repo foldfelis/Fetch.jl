@@ -43,14 +43,6 @@ function gfile_handler(url)
     return "https://docs.google.com/uc?export=download&id=$(h.captures[])"
 end
 
-function find_gcode(cookies)
-    for cookie in cookies
-        (match(r"download_warning_", cookie.name) !== nothing) && (return cookie.value)
-    end
-
-    return
-end
-
 function find_filename(header)
     m = match(r"filename=\\\"(.*)\\\"", header)
     if isnothing(m)
@@ -64,16 +56,16 @@ function find_filename(header)
 end
 
 function download_gdrive(url, localdir)
-    cookiejars = Dict{String, Set{HTTP.Cookies.Cookie}}()
-    HTTP.request("GET", url; cookies=true, cookiejar=cookiejars)
-    gcode = find_gcode(cookiejars["docs.google.com"])
+    m = match(r"confirm=([^;&]+)", url)
+    isnothing(m) && (url = "$url&confirm=pbef")
 
-    !isnothing(gcode) && (url = "$url&confirm=$gcode")
+    r = HTTP.head(url; status_exception = false)
+    HTTP.iserror(r) && r.status != 303 && throw(HTTP.StatusError(r.status, r.request.method, r.request.target, r))
+    r.status == 303 && (url = r["Location"])
 
     filepath = Ref{String}("")
     HTTP.open(
-        "GET", url, ["Range"=>"bytes=0-"],
-        cookies=true, cookiejar=cookiejars, redirect_limit=10
+        "GET", url, ["Range"=>"bytes=0-"], redirect_limit=10
     ) do stream
         response = HTTP.startread(stream)
         eof(stream) && return
