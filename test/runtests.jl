@@ -1,6 +1,7 @@
 using Fetch
 using Test
-using DataDeps
+
+include(joinpath(@__DIR__, "unpack.jl"))
 
 @testset "Fetch.jl" begin
     include("gdrive.jl")
