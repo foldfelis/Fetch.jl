@@ -9,17 +9,16 @@ HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StructTypes = "856f2bd8-1eba-4b0a-8007-ebc267875bd4"
+p7zip_jll = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 [compat]
-DataDeps = "0.7"
-HTTP = "0.9, 1"
+HTTP = "1"
 JSON3 = "1.9"
 StructTypes = "1.8"
 julia = "1.6"
 
 [extras]
-DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "DataDeps"]
+test = ["Test"]

@@ -2,7 +2,7 @@
     dataset = "ningjingyu/fetchtest"
 
     f = kdownload(dataset, pwd())
-    DataDeps.unpack(f)
+    unpack(f)
 
     open(joinpath(pwd(), "FetchTest", "FetchTest.txt"), "r") do file
         @test readline(file) == "Test"
@@ -24,7 +24,7 @@ end
 
     for url in urls
         f = kdownload(url, pwd())
-        DataDeps.unpack(f)
+        unpack(f)
 
         open(joinpath(pwd(), "FetchTest", "FetchTest.txt"), "r") do file
             @test readline(file) == "Test"
