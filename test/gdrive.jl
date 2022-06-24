@@ -4,7 +4,7 @@ const GFILE_NAME = "FetchTest"
 
 @testset "large file" begin
     f = gdownload(LARGE_GFILE, pwd())
-    DataDeps.unpack(f)
+    unpack(f)
 
     open(joinpath(pwd(), GFILE_NAME, "$GFILE_NAME.txt"), "r") do file
         @test readline(file) == "Test"
